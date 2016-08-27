@@ -2,6 +2,7 @@ package rx.firebase
 
 import com.google.firebase.database.*
 import rx.Observable
+import rx.Single
 import rx.lang.kotlin.observable
 
 enum class ChildEvent {
@@ -65,7 +66,7 @@ class DB {
         override fun onDataChange(ds: DataSnapshot) = it.onNext(ds)
 
         override fun onCancelled(error: DatabaseError) =
-          error?.let { e -> it.onError(DBException("${e.code} ${e.message} ${e.details}")) }
+          error?.let { e -> it.onError(e.exception()) }
       }
 
       addListenerForSingleValueEvent(listener)
@@ -89,7 +90,7 @@ class DB {
         override fun onDataChange(ds: DataSnapshot) = it.onNext(ds)
 
         override fun onCancelled(error: DatabaseError) =
-          error?.let { e -> it.onError(DBException("${e.code} ${e.message} ${e.details}")) }
+          error?.let { e -> it.onError(e.exception()) }
       }
 
       addValueEventListener(listener)
@@ -100,4 +101,13 @@ class DB {
     return single
   }
 
+  inline fun <reified T : Any> DatabaseReference.putValue(value: T) = rx.lang.kotlin.single<T> {
+
+    push().setValue(value) { e: DatabaseError, ref: DatabaseReference ->
+      if (e == null)
+        it.onSuccess(value)
+      else
+        it.onError(e.exception())
+    }
+  }
 }
