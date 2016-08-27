@@ -1,0 +1,60 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+buildscript {
+    ext.kotlin_version = '1.0.3'
+    ext.firebase_version = '9.4.0'
+    repositories {
+        mavenCentral()
+    }
+}
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        minSdkVersion 11
+        targetSdkVersion 23
+        versionCode 1
+        versionName '1.0'
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    lintOptions {
+        abortOnError false
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    //classpath 'com.google.gms:google-services:3.0.0'
+
+    compile "com.google.firebase:firebase-core:$firebase_version"
+    compile "com.google.firebase:firebase-auth:$firebase_version"
+    compile "com.google.firebase:firebase-crash:$firebase_version"
+    compile "com.google.firebase:firebase-database:$firebase_version"
+
+    compile 'io.reactivex:rxjava:1.1.9'
+    compile 'io.reactivex:rxkotlin:0.60.0'
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+}
