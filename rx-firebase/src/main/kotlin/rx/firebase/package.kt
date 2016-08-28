@@ -1,3 +1,5 @@
+@file:JvmName("Helper")
+
 package rx.firebase
 
 import com.google.firebase.auth.FirebaseAuthException

@@ -1,3 +1,5 @@
+@file:JvmName("DB")
+
 package rx.firebase
 
 import com.google.firebase.database.*
@@ -8,105 +10,98 @@ enum class ChildEvent {
   Moved, Changed, Added, Removed, Cancelled
 }
 
-class DB {
+inline fun <reified T : Any> DatabaseReference.childs(): Observable<Pair<ChildEvent, T>> =
+  childEvents().map { Pair(it.first, it.second.getValue(T::class.java)) }
 
-  val db = FirebaseDatabase.getInstance()
+inline fun DatabaseReference.childEvents(): Observable<Pair<ChildEvent, DataSnapshot>> {
+  var listener: ChildEventListener? = null
 
-  inline fun buildRef(url: String): DatabaseReference =
-    if (url.isEmpty()) db.reference else db.getReferenceFromUrl(url)
+  val childs = observable<Pair<ChildEvent, DataSnapshot>> {
 
-  inline fun <reified T : Any> DatabaseReference.childs(): Observable<Pair<ChildEvent, T>> =
-    childEvents().map { Pair(it.first, it.second.getValue(T::class.java)) }
-
-  inline fun DatabaseReference.childEvents(): Observable<Pair<ChildEvent, DataSnapshot>> {
-    var listener: ChildEventListener? = null
-
-    val childs = observable<Pair<ChildEvent, DataSnapshot>> {
-
-      listener = object : ChildEventListener {
-        override fun onChildMoved(ds: DataSnapshot?, p: String?) {
-          ds?.let { d -> it.onNext(Pair(ChildEvent.Moved, d)) }
-        }
-
-        override fun onChildChanged(ds: DataSnapshot?, p: String?) {
-          ds?.let { d -> it.onNext(Pair(ChildEvent.Changed, d)) }
-        }
-
-        override fun onChildAdded(ds: DataSnapshot?, p: String?) {
-          ds?.let { d -> it.onNext(Pair(ChildEvent.Added, d)) }
-        }
-
-        override fun onChildRemoved(ds: DataSnapshot?) {
-          ds?.let { d -> it.onNext(Pair(ChildEvent.Removed, d)) }
-        }
-
-        override fun onCancelled(error: DatabaseError?) {
-          error?.let { e -> it.onError(DBException("${e.code} ${e.message} ${e.details}")) }
-        }
+    listener = object : ChildEventListener {
+      override fun onChildMoved(ds: DataSnapshot?, p: String?) {
+        ds?.let { d -> it.onNext(Pair(ChildEvent.Moved, d)) }
       }
 
-      addChildEventListener(listener)
-    }
-
-    childs.doOnCompleted { listener?.let { l -> removeEventListener(l) } }
-    return childs
-  }
-
-  inline fun <reified T : Any> DatabaseReference.single(): Observable<T> =
-    singleEvent().map { it.getValue(T::class.java) }
-
-  inline fun DatabaseReference.singleEvent(): Observable<DataSnapshot> {
-
-    var listener: ValueEventListener? = null
-
-    val single = observable<DataSnapshot> {
-
-      listener = object : ValueEventListener {
-        override fun onDataChange(ds: DataSnapshot) = it.onNext(ds)
-
-        override fun onCancelled(error: DatabaseError) =
-          error?.let { e -> it.onError(e.exception()) }
+      override fun onChildChanged(ds: DataSnapshot?, p: String?) {
+        ds?.let { d -> it.onNext(Pair(ChildEvent.Changed, d)) }
       }
 
-      addListenerForSingleValueEvent(listener)
-    }
-
-    single.doOnCompleted { listener?.let { l -> removeEventListener(l) } }
-
-    return single
-  }
-
-  inline fun <reified T : Any> DatabaseReference.value(): Observable<T> =
-    valueEvent().map { it.getValue(T::class.java) }
-
-  inline fun DatabaseReference.valueEvent(): Observable<DataSnapshot> {
-
-    var listener: ValueEventListener? = null
-
-    val single = observable<DataSnapshot> {
-
-      listener = object : ValueEventListener {
-        override fun onDataChange(ds: DataSnapshot) = it.onNext(ds)
-
-        override fun onCancelled(error: DatabaseError) =
-          error?.let { e -> it.onError(e.exception()) }
+      override fun onChildAdded(ds: DataSnapshot?, p: String?) {
+        ds?.let { d -> it.onNext(Pair(ChildEvent.Added, d)) }
       }
 
-      addValueEventListener(listener)
+      override fun onChildRemoved(ds: DataSnapshot?) {
+        ds?.let { d -> it.onNext(Pair(ChildEvent.Removed, d)) }
+      }
+
+      override fun onCancelled(error: DatabaseError?) {
+        error?.let { e -> it.onError(DBException("${e.code} ${e.message} ${e.details}")) }
+      }
     }
 
-    single.doOnCompleted { listener?.let { l -> removeEventListener(l) } }
-
-    return single
+    addChildEventListener(listener)
   }
 
-  inline fun <reified T : Any> DatabaseReference.putValue(value: T) = rx.lang.kotlin.single<T> {
+  childs.doOnCompleted { listener?.let { l -> removeEventListener(l) } }
 
-    push().setValue(value) { e: DatabaseError, ref: DatabaseReference ->
-      if (e == null)
-        it.onSuccess(value)
-      else
-        it.onError(e.exception())
+  return childs
+}
+
+inline fun <reified T : Any> DatabaseReference.single(): Observable<T> =
+  singleEvent().map { it.getValue(T::class.java) }
+
+inline fun DatabaseReference.singleEvent(): Observable<DataSnapshot> {
+
+  var listener: ValueEventListener? = null
+
+  val single = observable<DataSnapshot> {
+
+    listener = object : ValueEventListener {
+      override fun onDataChange(ds: DataSnapshot) = it.onNext(ds)
+
+      override fun onCancelled(error: DatabaseError) =
+        error?.let { e -> it.onError(e.exception()) }
     }
+
+    addListenerForSingleValueEvent(listener)
+  }
+
+  single.doOnCompleted { listener?.let { l -> removeEventListener(l) } }
+
+  return single
+}
+
+inline fun <reified T : Any> DatabaseReference.value(): Observable<T> =
+  valueEvent().map { it.getValue(T::class.java) }
+
+inline fun DatabaseReference.valueEvent(): Observable<DataSnapshot> {
+
+  var listener: ValueEventListener? = null
+
+  val single = observable<DataSnapshot> {
+
+    listener = object : ValueEventListener {
+      override fun onDataChange(ds: DataSnapshot) = it.onNext(ds)
+
+      override fun onCancelled(error: DatabaseError) =
+        error?.let { e -> it.onError(e.exception()) }
+    }
+
+    addValueEventListener(listener)
+  }
+
+  single.doOnCompleted { listener?.let { l -> removeEventListener(l) } }
+
+  return single
+}
+
+inline fun <reified T : Any> DatabaseReference.putValue(value: T) = rx.lang.kotlin.single<T> {
+
+  push().setValue(value) { e: DatabaseError, ref: DatabaseReference ->
+    if (e == null)
+      it.onSuccess(value)
+    else
+      it.onError(e.exception())
   }
 }

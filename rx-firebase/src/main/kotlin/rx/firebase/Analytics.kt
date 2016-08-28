@@ -1,3 +1,5 @@
+@file:JvmName("Analytics")
+
 package rx.firebase
 
 import android.content.Context

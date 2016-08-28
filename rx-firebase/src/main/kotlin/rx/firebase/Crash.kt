@@ -1,3 +1,5 @@
+@file:JvmName("Crash")
+
 package rx.firebase
 
 import com.google.firebase.crash.FirebaseCrash
