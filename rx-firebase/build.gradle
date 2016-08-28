@@ -64,10 +64,8 @@ dependencies {
     compile "com.google.firebase:firebase-crash:$firebase_version"
     compile "com.google.firebase:firebase-database:$firebase_version"
 
-    compile 'io.reactivex.rxjava2:rxjava:2.0.0-RC1'
-    compile ('io.reactivex:rxkotlin:0.60.0' ) {
-        exclude group: 'io.reactivex', module: 'rxjava'
-    }
+    compile 'io.reactivex:rxjava:1.1.9'
+    compile 'io.reactivex:rxkotlin:0.60.0'
 
     testCompile 'junit:junit:4.12'
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
