@@ -1,28 +1,27 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.google.gms.google-services'
 
 buildscript {
 
     repositories {
+        jcenter()
         mavenCentral()
     }
+
     dependencies {
         classpath 'com.google.gms:google-services:3.0.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
-}
-
-repositories {
-    jcenter()
-    mavenCentral()
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
 
     defaultConfig {
         minSdkVersion 11
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName '1.0'
     }
@@ -65,8 +64,10 @@ dependencies {
     compile "com.google.firebase:firebase-crash:$firebase_version"
     compile "com.google.firebase:firebase-database:$firebase_version"
 
-    compile 'io.reactivex:rxjava:1.1.9'
-    compile 'io.reactivex:rxkotlin:0.60.0'
+    compile 'io.reactivex.rxjava2:rxjava:2.0.0-RC1'
+    compile ('io.reactivex:rxkotlin:0.60.0' ) {
+        exclude group: 'io.reactivex', module: 'rxjava'
+    }
 
     testCompile 'junit:junit:4.12'
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
@@ -75,6 +76,5 @@ dependencies {
 
 sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
+    test.java.srcDirs += 'src/test/kotlin'
 }
-
-apply plugin: 'com.google.gms.google-services'
