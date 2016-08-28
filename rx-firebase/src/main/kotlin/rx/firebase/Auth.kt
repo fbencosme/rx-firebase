@@ -1,18 +1,11 @@
-@file:JvmName("Auth")
+//@file:JvmName("Auth")
 
 package rx.firebase
 
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-
-import rx.Observable
-import rx.Single
-import rx.lang.kotlin.observable
-import rx.lang.kotlin.single
-import rx.lang.kotlin.singleOf
+import com.google.firebase.auth.*
+import rx.*
+import rx.lang.kotlin.*
 
 inline fun FirebaseAuth.logOut(): Single<Unit> =
   singleOf(signOut())

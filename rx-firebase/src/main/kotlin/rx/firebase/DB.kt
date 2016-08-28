@@ -3,8 +3,8 @@
 package rx.firebase
 
 import com.google.firebase.database.*
-import rx.Observable
-import rx.lang.kotlin.observable
+import rx.*
+import rx.lang.kotlin.*
 
 enum class ChildEvent {
   Moved, Changed, Added, Removed, Cancelled
@@ -48,7 +48,7 @@ inline fun DatabaseReference.childEvents(): Observable<Pair<ChildEvent, DataSnap
   return childs
 }
 
-inline fun <reified T : Any> DatabaseReference.single(): Observable<T> =
+inline fun <reified T : Any> DatabaseReference.singleEventValue(): Observable<T> =
   singleEvent().map { it.getValue(T::class.java) }
 
 inline fun DatabaseReference.singleEvent(): Observable<DataSnapshot> {
@@ -96,7 +96,7 @@ inline fun DatabaseReference.valueEvent(): Observable<DataSnapshot> {
   return single
 }
 
-inline fun <reified T : Any> DatabaseReference.putValue(value: T) = rx.lang.kotlin.single<T> {
+inline fun <reified T : Any> DatabaseReference.putValue(value: T) = single<T> {
 
   push().setValue(value) { e: DatabaseError, ref: DatabaseReference ->
     if (e == null)
