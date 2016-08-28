@@ -2,7 +2,6 @@ package rx.firebase
 
 import com.google.firebase.database.*
 import rx.Observable
-import rx.Single
 import rx.lang.kotlin.observable
 
 enum class ChildEvent {
