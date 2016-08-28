@@ -2,8 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 buildscript {
-    ext.kotlin_version = '1.0.3'
-    ext.firebase_version = '9.4.0'
+
     repositories {
         mavenCentral()
     }
@@ -39,6 +38,11 @@ android {
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
+    }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'META-INF/NOTICE'
     }
 }
 
