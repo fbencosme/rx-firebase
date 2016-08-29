@@ -1,1 +1,1 @@
-include ':sample', ':rx-firebase'
+include ':rx-firebase', ':sample'

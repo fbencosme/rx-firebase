@@ -99,7 +99,7 @@ inline fun DatabaseReference.valueEvent(): Observable<DataSnapshot> {
 inline fun <reified T : Any> DatabaseReference.putValue(value: T) = single<T> {
 
   push().setValue(value) { e: DatabaseError, ref: DatabaseReference ->
-    if (e == null)
+    if (e != null)
       it.onSuccess(value)
     else
       it.onError(e.exception())

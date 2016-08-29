@@ -17,7 +17,7 @@ object Analytics {
   inline fun userId(ctx: Context, id: String) =
     singleOf(FirebaseAnalytics.getInstance(ctx).setUserId(id))
 
-  inline fun userProperty(ctx: Context, property: Pair<String, String>) =
-    singleOf(FirebaseAnalytics.getInstance(ctx).setUserProperty(property.first, property.second))
+  inline fun userProperty(ctx: Context, prop: Pair<String, String>) =
+    singleOf(FirebaseAnalytics.getInstance(ctx).setUserProperty(prop.first, prop.second))
 
 }

@@ -1,4 +1,4 @@
-//@file:JvmName("Auth")
+@file:JvmName("Auth")
 
 package rx.firebase
 
@@ -35,9 +35,12 @@ inline fun FirebaseAuth.logInToken(token: String): Single<FirebaseUser> =
 
 inline fun Task<AuthResult>.toSingle(): Single<FirebaseUser> =
   single<FirebaseUser> {
-    this
-      .addOnSuccessListener { r -> it.onSuccess(r.user) }
-      .addOnFailureListener { e -> it.onError(e) }
+    addOnCompleteListener { t ->
+      if (t.isSuccessful)
+        it.onSuccess(t.result.user)
+      else
+        it.onError(t.exception)
+    }
   }
 
 inline fun FirebaseAuth.state(): Observable<FirebaseUser> {
